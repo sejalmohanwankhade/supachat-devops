@@ -7,7 +7,7 @@ import {
 import axios from 'axios';
 import { format } from 'date-fns';
 
-const API = process.env.REACT_APP_API_URL || '';
+const API = 'https://supachat-devops-production.up.railway.app';
 
 // ─── Color System ─────────────────────────────────────────────────────────────
 const PALETTE = {
