@@ -454,7 +454,8 @@ MIT — see LICENSE
 ---
 
 *Built with ❤️ for the SupaChat DevOps challenge*
-Output:
+## 📜 Output:
+
 <img width="955" height="381" alt="image" src="https://github.com/user-attachments/assets/201833d2-0c4b-48b3-9da4-00854aecfdc1" />
 
 
