@@ -11,15 +11,17 @@ env:
   IMAGE_PREFIX: ${{ github.repository_owner }}/supachat
 
 jobs:
-  # ────────────────────────────────────────────────────────────────────────────
+  # ─────────────────────────────────────────────────────────────
   # Job 1: Lint & Test
-  # ────────────────────────────────────────────────────────────────────────────
+  # ─────────────────────────────────────────────────────────────
   test:
     name: 🧪 Lint & Test
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
+      # Python Setup
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -29,12 +31,13 @@ jobs:
       - name: Install backend deps
         run: pip install -r backend/requirements.txt pytest httpx
 
+      # ✅ Clean Lint Step
       - name: Lint backend
         run: |
           pip install ruff
-          ruff check backend/ --fix || true
-          ruff check backend
+          ruff check backend --fix
 
+      # Tests
       - name: Test backend
         run: |
           cd backend
@@ -44,12 +47,14 @@ jobs:
           SUPABASE_URL: ""
           SUPABASE_ANON_KEY: ""
 
+      # Node Setup (FIXED ✅)
       - name: Set up Node
         uses: actions/setup-node@v4
-  with:
-    node-version: "20"
-    cache: 'npm'
-    cache-dependency-path: frontend/package-lock.json
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
       - name: Install frontend deps
         run: npm ci --legacy-peer-deps
         working-directory: frontend
@@ -61,14 +66,15 @@ jobs:
           CI: false
           REACT_APP_API_URL: ""
 
-  # ────────────────────────────────────────────────────────────────────────────
+  # ─────────────────────────────────────────────────────────────
   # Job 2: Build & Push Docker Images
-  # ────────────────────────────────────────────────────────────────────────────
+  # ─────────────────────────────────────────────────────────────
   build:
     name: 🐳 Build & Push Images
     runs-on: ubuntu-latest
     needs: test
     if: github.ref == 'refs/heads/main'
+
     permissions:
       contents: read
       packages: write
@@ -95,7 +101,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Backend
+      # Backend Image
       - name: Docker metadata (backend)
         id: meta-backend
         uses: docker/metadata-action@v5
@@ -115,7 +121,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      # Frontend
+      # Frontend Image
       - name: Docker metadata (frontend)
         id: meta-frontend
         uses: docker/metadata-action@v5
@@ -137,9 +143,9 @@ jobs:
           build-args: |
             REACT_APP_API_URL=
 
-  # ────────────────────────────────────────────────────────────────────────────
+  # ─────────────────────────────────────────────────────────────
   # Job 3: Deploy to EC2
-  # ────────────────────────────────────────────────────────────────────────────
+  # ─────────────────────────────────────────────────────────────
   deploy:
     name: 🚀 Deploy to EC2
     runs-on: ubuntu-latest
@@ -170,40 +176,33 @@ jobs:
             echo "📦 Pulling new images..."
             docker compose pull frontend backend
 
-            echo "🔄 Rolling update (zero downtime)..."
-            # Scale up new containers alongside old ones
+            echo "🔄 Rolling update..."
             docker compose up -d --no-deps --scale backend=2 backend
             sleep 15
             docker compose up -d --no-deps --scale backend=1 backend
 
-            # Update frontend
             docker compose up -d --no-deps frontend
 
             echo "🔃 Reloading Nginx..."
             docker compose exec -T nginx nginx -s reload
 
-            echo "🧹 Pruning old images..."
+            echo "🧹 Cleaning..."
             docker image prune -f
 
             echo "✅ Health check..."
             sleep 5
             curl -sf http://localhost/health | python3 -c "
-            import sys, json
-            d = json.load(sys.stdin)
-            assert d['status'] == 'healthy', f'Unhealthy: {d}'
-            print('Backend healthy ✓')
-            "
-            echo "🎉 Deployment complete! SHA: ${{ needs.build.outputs.sha_short }}"
+import sys, json
+d = json.load(sys.stdin)
+assert d['status'] == 'healthy'
+print('Backend healthy ✓')
+"
 
-      - name: Notify on failure
-        if: failure()
-        run: |
-          echo "❌ Deployment failed for SHA ${{ needs.build.outputs.sha_short }}"
-          # Add Slack/Discord webhook notification here
+            echo "🎉 Deployment complete!"
 
-  # ────────────────────────────────────────────────────────────────────────────
-  # Job 4: Post-deploy smoke test
-  # ────────────────────────────────────────────────────────────────────────────
+  # ─────────────────────────────────────────────────────────────
+  # Job 4: Smoke Test
+  # ─────────────────────────────────────────────────────────────
   smoke-test:
     name: 🔍 Smoke Test
     runs-on: ubuntu-latest
@@ -211,18 +210,18 @@ jobs:
     if: github.ref == 'refs/heads/main'
 
     steps:
-      - name: Run smoke tests against production
+      - name: Run smoke tests
         run: |
           BASE="http://${{ secrets.EC2_HOST }}"
 
           echo "Testing /health..."
           STATUS=$(curl -sf "$BASE/health" | python3 -c "import sys,json; print(json.load(sys.stdin)['status'])")
-          [ "$STATUS" = "healthy" ] && echo "✓ Health OK" || (echo "✗ Health failed"; exit 1)
+          [ "$STATUS" = "healthy" ] && echo "✓ Health OK" || exit 1
 
-          echo "Testing /api/suggestions..."
-          curl -sf "$BASE/api/suggestions" | python3 -c "import sys,json; d=json.load(sys.stdin); assert len(d['suggestions']) > 0" && echo "✓ Suggestions OK"
+          echo "Testing suggestions..."
+          curl -sf "$BASE/api/suggestions" | python3 -c "import sys,json; assert len(json.load(sys.stdin)['suggestions']) > 0" && echo "✓ OK"
 
           echo "Testing frontend..."
           curl -sf "$BASE/" | grep -q "SupaChat" && echo "✓ Frontend OK"
 
-          echo "🎉 All smoke tests passed!"
+          echo "🎉 All tests passed!"
