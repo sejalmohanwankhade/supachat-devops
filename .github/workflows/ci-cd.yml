@@ -73,3 +73,4 @@ jobs:
 
       - name: Build frontend image
         run: docker build -t frontend ./frontend
+        # trigger test
