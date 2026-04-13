@@ -464,13 +464,18 @@ Test 2 — Full App
 https://lovely-dream-production-36ea.up.railway.app
 
 ## Test 3 — Type These Queries
-# Show top trending topics in last 30 days
-# Plot daily views trend
-# Compare article engagement by topic
-# Who are top 5 authors by total views
+# 1.  Show top trending topics in last 30 days
+# 2. Plot daily views trend
+# 3. Compare article engagement by topic
+# 4. Who are top 5 authors by total views
 
 ## 📜 Output:
 
-<img width="955" height="381" alt="image" src="https://github.com/user-attachments/assets/201833d2-0c4b-48b3-9da4-00854aecfdc1" />
+
+# 1. <img width="955" height="381" alt="image" src="https://github.com/user-attachments/assets/201833d2-0c4b-48b3-9da4-00854aecfdc1" />
+# 2. <img width="950" height="389" alt="image" src="https://github.com/user-attachments/assets/11d7421a-24bc-44b7-aac7-83d18b88f4e5" />
+# 3. <img width="904" height="387" alt="image" src="https://github.com/user-attachments/assets/f644b8f6-2040-4975-8082-64b2b46106d8" />
+# 4. <img width="917" height="382" alt="image" src="https://github.com/user-attachments/assets/60a962e3-4580-4f27-9fdc-934cd9ebc6a4" />
+
 
 
