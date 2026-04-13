@@ -459,13 +459,15 @@ MIT — see LICENSE
 Now Test Everything
 Test 1 — Backend Health
 https://supachat-devops-production.up.railway.app/health
+
 Test 2 — Full App
 https://lovely-dream-production-36ea.up.railway.app
-Test 3 — Type These Queries
-Show top trending topics in last 30 days
-Plot daily views trend
-Compare article engagement by topic
-Who are top 5 authors by total views
+
+## Test 3 — Type These Queries
+# Show top trending topics in last 30 days
+# Plot daily views trend
+# Compare article engagement by topic
+# Who are top 5 authors by total views
 
 ## 📜 Output:
 
