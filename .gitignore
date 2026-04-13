@@ -1,0 +1,41 @@
+# Environment
+.env
+*.env.local
+*.env.production
+
+# Node
+node_modules/
+frontend/build/
+frontend/.cache/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+dist/
+.pytest_cache/
+
+# Docker volumes
+monitoring/prometheus/data/
+monitoring/grafana/data/
+monitoring/loki/data/
+
+# SSL certs
+nginx/ssl/
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+
+# IDE
+.idea/
+.vscode/
+*.code-workspace
+
+# Logs
+*.log
+logs/

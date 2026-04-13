@@ -1,0 +1,45 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    env: production
+    project: supachat
+
+rule_files:
+  - /etc/prometheus/alerts.yml
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+scrape_configs:
+  # ── SupaChat Backend ──────────────────────────────────────────────────────
+  - job_name: supachat_backend
+    static_configs:
+      - targets: [backend:8000]
+    metrics_path: /metrics
+    scrape_interval: 15s
+
+  # ── Nginx ──────────────────────────────────────────────────────────────────
+  - job_name: nginx
+    static_configs:
+      - targets: [nginx:80]
+    metrics_path: /nginx-health
+    scrape_interval: 30s
+
+  # ── Node Exporter (Host) ──────────────────────────────────────────────────
+  - job_name: node_exporter
+    static_configs:
+      - targets: [node-exporter:9100]
+
+  # ── cAdvisor (Containers) ─────────────────────────────────────────────────
+  - job_name: cadvisor
+    static_configs:
+      - targets: [cadvisor:8080]
+    scrape_interval: 15s
+
+  # ── Prometheus Self-monitoring ────────────────────────────────────────────
+  - job_name: prometheus
+    static_configs:
+      - targets: [localhost:9090]
