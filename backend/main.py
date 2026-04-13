@@ -4,14 +4,12 @@ SupaChat Backend - FastAPI application for conversational analytics
 import os
 import time
 import json
-import logging
 from contextlib import asynccontextmanager
 from typing import Optional, List, Dict, Any
 
 import httpx
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 import anthropic
 from prometheus_client import Counter, Histogram, Gauge, generate_latest, CONTENT_TYPE_LATEST
